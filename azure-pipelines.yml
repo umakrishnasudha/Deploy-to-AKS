@@ -20,7 +20,7 @@ stages:
     - task: Docker@2
       displayName: Build an image
       inputs:
-        containerRegistry: 'K8SExamplesACR'
+        containerRegistry: 'acr_connection'
         repository: '$(imageRepo)'
         command: 'buildAndPush'
         Dockerfile: '$(Build.SourcesDirectory)/app/Dockerfile'
@@ -60,7 +60,7 @@ stages:
               namespace: 'default'
               secretType: 'dockerRegistry'
               secretName: '$(acrsecret)'
-              dockerRegistryEndpoint: 'K8SExamplesACR'
+              dockerRegistryEndpoint: 'acr_connection'
           - task: replacetokens@3
             displayName: Replace Tokens
             inputs:
@@ -78,6 +78,7 @@ stages:
           - task: KubernetesManifest@0
             inputs:
               action: 'deploy'
+              kubernetesServiceConnection: 'kubernates_connection'
               namespace: 'default'
               manifests: |
                 $(Pipeline.Workspace)/manifests/deployment.yml
