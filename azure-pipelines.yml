@@ -20,7 +20,7 @@ stages:
     - task: Docker@2
       displayName: Build an image
       inputs:
-        containerRegistry: 'acr_connection'
+        containerRegistry: 'wagcon'
         repository: '$(imageRepo)'
         command: 'buildAndPush'
         Dockerfile: '$(Build.SourcesDirectory)/app/Dockerfile'
@@ -37,7 +37,7 @@ stages:
   dependsOn: Build
   variables:
     acrsecret: k8sexamplesacrauth
-    acrdevurl: 'acr1001.azurecr.io'
+    acrdevurl: 'wagcon.azurecr.io'
     replicaNo: 2
   jobs:
   - deployment: Deploy
@@ -57,16 +57,16 @@ stages:
           - task: KubernetesManifest@0
             inputs:
               action: 'createSecret'
-              kubernetesServiceConnection: 'kubernates_connection'
+              kubernetesServiceConnection: 'k8s_connection'
               namespace: 'default'
               secretType: 'dockerRegistry'
               secretName: '$(acrsecret)'
-              dockerRegistryEndpoint: 'acr_connection'
+              dockerRegistryEndpoint: 'wagcon'
               
           - task: KubernetesManifest@0
             inputs:
               action: 'deploy'
-              kubernetesServiceConnection: 'kubernates_connection'
+              kubernetesServiceConnection: 'k8s_connection'
               namespace: 'default'
               manifests: |
                 $(Pipeline.Workspace)/manifests/deployment.yml
